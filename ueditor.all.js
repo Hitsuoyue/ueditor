@@ -8595,6 +8595,7 @@ var filterWord = UE.filterWord = function () {
 
     //是否是word过来的内容
     function isWordDocument( str ) {
+        console.log('str', str)
         return /(class="?Mso|style="[^"]*\bmso\-|w:WordDocument|<(v|o):|lang=)/ig.test( str );
     }
     //去掉小数
@@ -8627,6 +8628,8 @@ var filterWord = UE.filterWord = function () {
                         return '';
                     }
                 })
+                //针对chrome的style标签
+                .replace(/<style[^>]*>(.|\n)*<\/style>/g,'')
                 //针对wps添加的多余标签处理
                 .replace(/<\/?div[^>]*>/g,'')
                 //去掉多余的属性
@@ -14840,6 +14843,7 @@ UE.plugins['paste'] = function () {
             me.filterInputRule(root);
             //针对chrome的处理
             if (browser.webkit) {
+                console.log('root', root)
                 var br = root.lastChild();
                 if (br && br.type == 'element' && br.tagName == 'br') {
                     root.removeChild(br)
@@ -23352,7 +23356,8 @@ UE.plugins['catchremoteimage'] = function () {
         catchRemoteImageEnable: false
     });
 
-    me.addListener("afterpaste", function () {
+    me.addListener("afterpaste", function (html) {
+        console.log('html', html)
         me.fireEvent("catchRemoteImage");
     });
 
@@ -23379,6 +23384,7 @@ UE.plugins['catchremoteimage'] = function () {
                 return false;
             };
 
+
         for (var i = 0, ci; ci = imgs[i++];) {
             if (ci.getAttribute("word_img")) {
                 continue;
@@ -23388,6 +23394,9 @@ UE.plugins['catchremoteimage'] = function () {
                 remoteImages.push(src);
             }
         }
+        
+        console.log('imgs', imgs)
+        console.log('remoteImages', remoteImages)
 
         if (remoteImages.length) {
             catchremoteimage(remoteImages, {
@@ -23425,6 +23434,7 @@ UE.plugins['catchremoteimage'] = function () {
         }
 
         function catchremoteimage(imgs, callbacks) {
+            console.log('imgs', imgs)
             var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
                 url = utils.formatUrl(catcherActionUrl + (catcherActionUrl.indexOf('?') == -1 ? '?':'&') + params),
                 isJsonp = utils.isCrossDomainUrl(url),
@@ -23974,28 +23984,52 @@ UE.plugin.register('autoupload', function (){
         }
 
         /* 创建Ajax并提交 */
+        // author: suoyue
         var xhr = new XMLHttpRequest(),
-            fd = new FormData(),
-            params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
-            url = utils.formatUrl(actionUrl + (actionUrl.indexOf('?') == -1 ? '?':'&') + params);
+            formData = new FormData();
+        formData.append("file", file); // 文件对象
+        xhr.open("post", "/knowledge/UploadFileToOSS.json", true);
+        xhr.onload = function () {
+            if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                var res = JSON.parse(xhr.responseText)
+                // MRRK: 自定义返回图片的url字段名
+                // author: eschere
+                var url = res[me.options.imageResponseKey] || res.url;
+                var link = me.options.imageUrlPrefix + url;
+                loader = me.document.getElementById(loadingId);
 
-        fd.append(fieldName, file, file.name || ('blob.' + file.type.substr('image/'.length)));
-        fd.append('type', 'ajax');
-        xhr.open("post", url, true);
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.addEventListener('load', function (e) {
-            try{
-                var json = (new Function("return " + utils.trim(e.target.response)))();
-                if (json.state == 'SUCCESS' && json.url) {
-                    successHandler(json);
+                if (url && loader) {
+                    loader.setAttribute('src', link);
+                    loader.setAttribute('_src', link);
+                    loader.setAttribute('title', res.title || '');
+                    loader.setAttribute('alt', res.original || '');
+                    loader.removeAttribute('id');
+                    domUtils.removeClasses(loader, 'loadingclass');
+                    me.fireEvent("contentchange");
                 } else {
-                    errorHandler(json.state);
+                    showErrorLoader('上传错误');
                 }
-            }catch(er){
-                errorHandler(me.getLang('autoupload.loadError'));
+            } else {
+                showErrorLoader(me.getLang('simpleupload.loadError'));
             }
-        });
-        xhr.send(fd);
+        };
+        xhr.onerror = function () {
+            showErrorLoader(me.getLang('simpleupload.loadError'));
+        };
+        xhr.send(formData);
+        // xhr.addEventListener('load', function (e) {
+        //     try{
+        //         var json = (new Function("return " + utils.trim(e.target.response)))();
+        //         if (json.state == 'SUCCESS' && json.url) {
+        //             successHandler(json);
+        //         } else {
+        //             errorHandler(json.state);
+        //         }
+        //     }catch(er){
+        //         errorHandler(me.getLang('autoupload.loadError'));
+        //     }
+        // });
+        // xhr.send(fd);
     }
 
     function getPasteImage(e){
@@ -24032,6 +24066,7 @@ UE.plugin.register('autoupload', function (){
                             var len = items.length,
                                 file;
                             while (len--){
+                                console.log('file', items[len])
                                 file = items[len];
                                 if(file.getAsFile) file = file.getAsFile();
                                 if(file && file.size > 0) {
