@@ -22259,10 +22259,6 @@ UE.plugins['contextmenu'] = function () {
                                 }
                                 this.getDialog('edittable').open();
                             }
-                        },
-                        {
-                            label:lang.setbordervisible,
-                            cmdName:'setbordervisible'
                         }
                     ]
                 },
