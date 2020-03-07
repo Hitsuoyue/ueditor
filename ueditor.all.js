@@ -25827,13 +25827,19 @@ UE.ui = baidu.editor.ui = {};
     utils.inherits(ColorPicker, UIBase);
 
     var COLORS = (
-        'ffffff,000000,eeece1,1f497d,4f81bd,c0504d,9bbb59,8064a2,4bacc6,f79646,' +
-            'f2f2f2,7f7f7f,ddd9c3,c6d9f0,dbe5f1,f2dcdb,ebf1dd,e5e0ec,dbeef3,fdeada,' +
-            'd8d8d8,595959,c4bd97,8db3e2,b8cce4,e5b9b7,d7e3bc,ccc1d9,b7dde8,fbd5b5,' +
-            'bfbfbf,3f3f3f,938953,548dd4,95b3d7,d99694,c3d69b,b2a2c7,92cddc,fac08f,' +
-            'a5a5a5,262626,494429,17365d,366092,953734,76923c,5f497a,31859b,e36c09,' +
-            '7f7f7f,0c0c0c,1d1b10,0f243e,244061,632423,4f6128,3f3151,205867,974806,' +
+        'fff,000,0000ff,00b0f0,00ff00,ffff00,ffc000,9420ff,ff00ff,f00,' +
+            'f2f2f2,7f7f7f,0000ff4d,00b0f04d,00ff0033,ffff0033,ffc00033,9420ff1a,ff00ff33,ff000033,' +
+            'd8d8d8,595959,0000ff99,00b0f099,00ff00cc,ffff0080,ffc00080,9420ff4d,ff00ff80,ff000066,' +
+            'bfbfbf,3f3f3f,0000ffcc,00b0f0cc,04cc04,cccc01,ffc000cc,9420ff99,ff00ffb3,ff0000b3,' +
+            'a5a5a5,262626,06068acc,0592c5,028c02,adad04,b98c02,6c09c7cc,b103b1,bf0404,' +
+            '7f7f7f,0c0c0c,070750cc,086688,014201,696902,806103,6507bb,820382,960303,' +
             'c00000,ff0000,ffc000,ffff00,92d050,00b050,00b0f0,0070c0,002060,7030a0,').split(',');
+            // 'f2f2f2,7f7f7f,ddd9c3,c6d9f0,dbe5f1,f2dcdb,ebf1dd,e5e0ec,dbeef3,fdeada,' +
+            // 'd8d8d8,595959,c4bd97,8db3e2,b8cce4,e5b9b7,d7e3bc,ccc1d9,b7dde8,fbd5b5,' +
+            // 'bfbfbf,3f3f3f,938953,548dd4,95b3d7,d99694,c3d69b,b2a2c7,92cddc,fac08f,' +
+            // 'a5a5a5,262626,494429,17365d,366092,953734,76923c,5f497a,31859b,e36c09,' +
+            // '7f7f7f,0c0c0c,1d1b10,0f243e,244061,632423,4f6128,3f3151,205867,974806,' +
+            // 'c00000,ff0000,ffc000,ffff00,92d050,00b050,00b0f0,0070c0,002060,7030a0,').split(',');
 
     function genColorPicker(noColorText,editor){
         var html = '<div id="##" class="edui-colorpicker %%">' +
